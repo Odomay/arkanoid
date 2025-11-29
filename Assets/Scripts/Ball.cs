@@ -13,7 +13,10 @@ public class Ball : MonoBehaviour
     private Vector3 _reflectedDirection;
     private Vector3 _ballPosition;
     private Vector3 _platformPosition;
+    private Vector3 _savedDirectionAfterCollision;
+    private Vector3 _savedDirection;
     private bool _ballOnPlatform;
+    private bool _firstLaunch;
     private int _downWallLayerIndex = 6;
 
     private void Awake()
@@ -23,16 +26,20 @@ public class Ball : MonoBehaviour
         _platformPosition = Platform.position;
 
         GameManager.OnBlocksCountEnded += StopBall;
+        PauseManager.OnGamePaused += PauseBall;
+        PauseManager.OnGameResumed += ResumeBall;
     }
 
     private void Start()
     {
         _ballOnPlatform = true;
     }
+
     private void OnCollisionEnter2D(Collision2D collision)
     {
         Vector3 hit = collision.contacts[0].normal;
-        _rigidbody.velocity = Vector3.Reflect(_reflectedDirection, hit).normalized * JumpForce;
+        _savedDirectionAfterCollision = Vector3.Reflect(_reflectedDirection, hit).normalized * JumpForce;
+        _rigidbody.velocity = _savedDirectionAfterCollision;
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
@@ -54,10 +61,12 @@ public class Ball : MonoBehaviour
         {
             transform.position = new Vector3(Platform.position.x, transform.position.y, transform.position.z);
         }
-        if (Input.GetKeyDown(KeyCode.Space) && _ballOnPlatform )
+
+        if (Input.GetKeyDown(KeyCode.Space) && _ballOnPlatform)
         {
-            //_rigidbody.velocity = (Vector2.up + new Vector2(Random.Range(-1f, 1f), 0)) * JumpForce;
-            _rigidbody.velocity = Vector2.up * JumpForce ;
+            
+            _rigidbody.velocity = (Vector2.up + new Vector2(Random.Range(-1f, 1f), 0)) * JumpForce;
+            //_rigidbody.velocity = Vector2.up * JumpForce ;
             _ballOnPlatform = false;
         }
     }
@@ -85,7 +94,26 @@ public class Ball : MonoBehaviour
         _rigidbody.velocity = Vector2.zero;
         _rigidbody.angularVelocity = 0;
         _ballOnPlatform = false;
-        GameManager.OnBlocksCountEnded -= StopBall;
     }
 
+    private void OnDestroy()
+    {
+        GameManager.OnBlocksCountEnded -= StopBall;
+        PauseManager.OnGamePaused -= PauseBall;
+        PauseManager.OnGameResumed -= ResumeBall;
+    }
+
+    private void PauseBall()
+    {
+        _savedDirection = _rigidbody.velocity;
+        _rigidbody.velocity = Vector2.zero;
+        _rigidbody.angularVelocity = 0;
+        _ballOnPlatform = false;
+        
+    }
+
+    private void ResumeBall()
+    {
+        _rigidbody.velocity = _savedDirection;
+    }
 }

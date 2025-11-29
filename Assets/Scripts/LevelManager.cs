@@ -11,6 +11,7 @@ public class LevelManager : MonoBehaviour
     public BlockV2 BlockV2;
     public BlockV3 BlockV3;
     public BlockV4 BlockV4;
+    public List<Color> BackgroundColors = new List<Color>();
 
     private delegate void SpawnShape();
     private delegate void BlockBehaviour();
@@ -20,13 +21,14 @@ public class LevelManager : MonoBehaviour
     {
         int levelIndex = SceneManager.GetActiveScene().buildIndex;
         SetupLevel(levelIndex);
+        ChangeBackgroundColor();
     }
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Escape))
+        if (Input.GetKeyDown(KeyCode.Tab))
         {
-            SceneManager.LoadScene(0);
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
         }
     }
 
@@ -64,8 +66,14 @@ public class LevelManager : MonoBehaviour
 
         _usedCombinations.Add((behaviourIndex, spawnIndex));
 
-        spawns[spawnIndex]();
-        behaviours[behaviourIndex]();
+        spawns[spawnIndex](); 
+        behaviours[behaviourIndex](); // в каждый блок передать статический индекс из поведения 
+    }
+
+    private void ChangeBackgroundColor()
+    {
+        Color newColor = BackgroundColors[Random.Range(0, BackgroundColors.Count)];
+        Camera.main.backgroundColor = newColor;
     }
 }
 /*

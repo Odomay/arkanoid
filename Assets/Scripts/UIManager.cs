@@ -7,6 +7,7 @@ public class UIManager : MonoBehaviour
     public TMP_Text AttemptsCountText;
     public TMP_Text BlocksCountText;
     public GameObject WinPanel;
+    public GameObject LosePanel;
 
     private void Start()
     {
@@ -16,6 +17,7 @@ public class UIManager : MonoBehaviour
         GameManager.OnAttemptsCountChanged += UpdateAttemptsCountText;
         GameManager.OnBlocksCountChanged += UpdateBlocksCountText;
         GameManager.OnBlocksCountEnded += ActivateWinPanel;
+        GameManager.OnAttemptsCountEnded += ActivateLosePanel;
     }
 
     private void OnDisable()
@@ -23,6 +25,7 @@ public class UIManager : MonoBehaviour
         GameManager.OnAttemptsCountChanged -= UpdateAttemptsCountText;
         GameManager.OnBlocksCountChanged -= UpdateBlocksCountText;
         GameManager.OnBlocksCountEnded -= ActivateWinPanel;
+        GameManager.OnAttemptsCountEnded -= ActivateLosePanel;
     }
 
     private void UpdateAttemptsCountText()
@@ -38,5 +41,10 @@ public class UIManager : MonoBehaviour
     private void ActivateWinPanel()
     {
         WinPanel.SetActive(true);
+    }
+
+    private void ActivateLosePanel()
+    {
+        LosePanel.SetActive(true);
     }
 }

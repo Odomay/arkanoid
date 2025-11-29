@@ -6,6 +6,7 @@ using System.Collections;
 public class GameManager : MonoBehaviour
 {
     public static event Action OnAttemptsCountChanged;
+    public static event Action OnAttemptsCountEnded;
     public static event Action OnBlocksCountChanged;
     public static event Action OnBlocksCountEnded;
 
@@ -57,7 +58,11 @@ public class GameManager : MonoBehaviour
     private void RemoveAttempt()
     {
         AttemptsCount--;
-        OnAttemptsCountChanged?.Invoke();        
+        OnAttemptsCountChanged?.Invoke(); 
+        if (AttemptsCount == 0)
+        {
+            OnAttemptsCountEnded?.Invoke();
+        }
     }
 
     public void SetBlocksCount(List<GameObject> blocksCount)

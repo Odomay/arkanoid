@@ -1,7 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
-using System.IO.IsolatedStorage;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class Platform : MonoBehaviour
@@ -13,17 +9,19 @@ public class Platform : MonoBehaviour
 
     private void Awake()
     {
-        //Debug.Log($"Skorost' igroka = {MoveSpeed} km/h, prikooooool"); // интерполяция строк (процесс получения промежуточных значений)
-        //Debug.Log("Skorost' igroka = " + MoveSpeed + "km/h, prikooooool"); // конкатенация строк (сложение строк)
-        GameManager.OnBlocksCountEnded += StopPlatform;
-        _transform = GetComponent<Transform>();       
+        _transform = GetComponent<Transform>();
+
+        GameManager.OnBlocksCountEnded += StopPlatform;        
+        GameManager.OnAttemptsCountEnded += StopPlatform;
+
+        PauseManager.OnGamePaused += PausePlatform;
+        PauseManager.OnGameResumed += ResumePlatform;
     }
 
     private void Update()
     {
         if (_move)
         MouseInput();
-        
     }
 
     private void MouseInput()
@@ -46,9 +44,30 @@ public class Platform : MonoBehaviour
         }
     }
 
+    private void ResumePlatform()
+    {
+        _move = true;
+    }
+
     private void StopPlatform()
     {
         _move = false;
         GameManager.OnBlocksCountEnded -= StopPlatform;
+        GameManager.OnAttemptsCountEnded -= StopPlatform;
+    }
+
+    private void PausePlatform()
+    {
+        _move = false;
+    }
+
+    private void OnDestroy()
+    {
+        PauseManager.OnGamePaused -= PausePlatform;
+    }
+
+    private void ResumeGame()
+    {
+        _move = true;
     }
 }

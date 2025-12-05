@@ -1,3 +1,4 @@
+using DG.Tweening;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -9,12 +10,12 @@ public class ButtonsManager : MonoBehaviour
 {
     public Button NextLevelButton;
     public Button[] RestartButtons;
-    public Button[] ExitButtons;
+    public Button[] ExitMenuButtons;
     public static event Action OnNexLevelButtonPressed;
 
     private void Awake()
     {
-        ExitGame(ExitButtons);
+        ExitGame(ExitMenuButtons);
         RestartGame(RestartButtons);
         NextLevelButton.onClick.AddListener(NextGameLevel);
 
@@ -27,32 +28,52 @@ public class ButtonsManager : MonoBehaviour
     private void NextGameLevel()
     {
         OnNexLevelButtonPressed?.Invoke();
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
+        NextLevelButton.transform.DOScale(0.9f, 0.3f).SetEase(Ease.OutQuad).OnComplete(() =>
+        {
+            NextLevelButton.transform.localScale = Vector3.one;
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
+        });
     }
 
     private void RestartGame(Button[] buttons)
     {
         for (int i = 0; i < buttons.Length; i++)
         {
-            buttons[i].onClick.AddListener(Restart);
+            buttons[i].onClick.AddListener(() => Restart(i));
         }
 
-        void Restart()
+        void Restart(int index)
         {
-            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+            for (index = 0; index < buttons.Length; index++)
+            {
+                buttons[index].transform.DOScale(0.9f, 0.3f).SetEase(Ease.OutQuad).OnComplete(() =>
+                {
+                    buttons[index].transform.localScale = Vector3.one;
+                    SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+                });
+            }
+            
         }
     }
 
     private void ExitGame(Button[] buttons)
     {
-        for (int i = 0; i < buttons.Length; i ++)
+        for (int i = 0; i < buttons.Length; i++)
         {
-            buttons[i].onClick.AddListener(Exit);
+            buttons[i].onClick.AddListener(() => Exit(i));
         }
 
-        void Exit()
+        void Exit(int index)
         {
-            Application.Quit();
+            for (index = 0; index < buttons.Length; index++)
+            {
+                buttons[index].transform.DOScale(0.9f, 0.3f).SetEase(Ease.OutQuad).OnComplete(() =>
+                {
+                    buttons[index].transform.localScale = Vector3.one;
+                    SceneManager.LoadScene(3);
+                });
+            }          
+
         }
     }
 }

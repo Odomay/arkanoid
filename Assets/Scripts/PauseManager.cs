@@ -1,6 +1,7 @@
 using System;
 using UnityEngine;
 using UnityEngine.UI;
+using DG.Tweening;
 
 public class PauseManager : MonoBehaviour
 {
@@ -20,6 +21,7 @@ public class PauseManager : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Escape))
         {
+            
             PauseGame();
         }
 
@@ -31,7 +33,7 @@ public class PauseManager : MonoBehaviour
 
     private void PauseGame()
     {
-        Debug.Log("press");
+        PauseGameButton.transform.DOScale(0.9f, 0.3f).SetEase(Ease.OutQuad).OnComplete(() => PauseGameButton.transform.localScale = Vector3.one);
         PausePanel.SetActive(true);
         PauseGameButton.interactable = false;
         OnGamePaused?.Invoke();
@@ -40,8 +42,12 @@ public class PauseManager : MonoBehaviour
 
     private void ResumeGame()
     {
-        OnGameResumed?.Invoke();
-        PausePanel.SetActive(false);
-        PauseGameButton.interactable = true;
+        ResumeGameButton.transform.DOScale(0.9f, 0.3f).SetEase(Ease.OutQuad).OnComplete(() =>
+        {
+            ResumeGameButton.transform.localScale = Vector3.one;
+            OnGameResumed?.Invoke();
+            PausePanel.SetActive(false);
+            PauseGameButton.interactable = true;
+        });
     }
 }

@@ -1,13 +1,12 @@
 using DG.Tweening;
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class ButtonsManager : MonoBehaviour
 {
+    public static event Action OnButtonPresed;
     public Button NextLevelButton;
     public Button[] RestartButtons;
     public Button[] ExitMenuButtons;
@@ -15,7 +14,7 @@ public class ButtonsManager : MonoBehaviour
 
     private void Awake()
     {
-        ExitGame(ExitMenuButtons);
+        ExitMenu(ExitMenuButtons);
         RestartGame(RestartButtons);
         NextLevelButton.onClick.AddListener(NextGameLevel);
 
@@ -39,40 +38,33 @@ public class ButtonsManager : MonoBehaviour
     {
         for (int i = 0; i < buttons.Length; i++)
         {
-            buttons[i].onClick.AddListener(() => Restart(i));
-        }
+            int index = i;
 
-        void Restart(int index)
-        {
-            for (index = 0; index < buttons.Length; index++)
+            buttons[index].onClick.AddListener(() =>
             {
                 buttons[index].transform.DOScale(0.9f, 0.3f).SetEase(Ease.OutQuad).OnComplete(() =>
                 {
                     buttons[index].transform.localScale = Vector3.one;
                     SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
                 });
-            }
-            
+            });
         }
     }
 
-    private void ExitGame(Button[] buttons)
+    private void ExitMenu(Button[] buttons)
     {
         for (int i = 0; i < buttons.Length; i++)
         {
-            buttons[i].onClick.AddListener(() => Exit(i));
-        }
+            int index = i;
 
-        void Exit(int index)
-        {
-            for (index = 0; index < buttons.Length; index++)
+            buttons[index].onClick.AddListener(() =>
             {
                 buttons[index].transform.DOScale(0.9f, 0.3f).SetEase(Ease.OutQuad).OnComplete(() =>
                 {
                     buttons[index].transform.localScale = Vector3.one;
-                    SceneManager.LoadScene(3);
+                    OnButtonPresed?.Invoke();
                 });
-            }          
+            });
 
         }
     }

@@ -6,10 +6,12 @@ public class Platform : MonoBehaviour
 
     private Transform _transform;
     private bool _move = true;
+    private FixedJoystick _joystick;
 
     private void Awake()
     {
         _transform = GetComponent<Transform>();
+        _joystick = FindFirstObjectByType<FixedJoystick>();
 
         GameManager.OnBlocksCountEnded += StopPlatform;        
         GameManager.OnAttemptsCountEnded += StopPlatform;
@@ -26,10 +28,11 @@ public class Platform : MonoBehaviour
 
     private void MouseInput()
     {
-        Vector3 mousePosition = Input.mousePosition;
-        Vector3 mousePositionOnScreen = Camera.main.ScreenToWorldPoint(mousePosition);
-        _transform.position = new Vector3(Mathf.Clamp (mousePositionOnScreen.x, -24.6f, 24.6f), _transform.position.y, _transform.position.z);
-        
+        // Vector3 mousePosition = Input.mousePosition;
+        // Vector3 mousePositionOnScreen = Camera.main.ScreenToWorldPoint(mousePosition);
+        // _transform.position = new Vector3(Mathf.Clamp (mousePositionOnScreen.x, -24.6f, 24.6f), _transform.position.y, _transform.position.z);
+        float horizontal = _joystick.Horizontal;
+        transform.position += Vector3.right * horizontal * MoveSpeed * Time.deltaTime;
     }
 
     private void KeyboardInput()

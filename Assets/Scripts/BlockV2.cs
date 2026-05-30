@@ -21,6 +21,11 @@ public class BlockV2 : MonoBehaviour
         {
             StartCoroutine(BlockDestroy());
         }
+        if (_blockSprites.Length == 0)
+        {
+            return;
+        }
+        if (_spriteRenderer == null) return;
         _spriteRenderer.sprite = _blockSprites[_lives];
         _spriteRenderer.color = _blockColor[_lives];
         _lives -= 1;

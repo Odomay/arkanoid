@@ -19,7 +19,7 @@ public class GameManager : MonoBehaviour
 
     private void Awake()
     {
-        AttemptsCount = 5;
+        AttemptsCount = 5-0;
         CheckBlocks = StartCoroutine(CheckBlocksCount());
     }
 

@@ -1,11 +1,9 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class LevelManager : MonoBehaviour
 {  
-
     public BlockSpawner BlockSpawner;
     public BlockV1 BlockV1;
     public BlockV2 BlockV2;
@@ -14,8 +12,6 @@ public class LevelManager : MonoBehaviour
     public List<Color> BackgroundColors = new List<Color>();
 
     private delegate void SpawnShape();
-    private delegate void BlockBehaviour();
-    private List<(int, int)> _usedCombinations = new List<(int, int)>();
 
     private void Awake()
     {
@@ -28,18 +24,13 @@ public class LevelManager : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Tab))
         {
+            Debug.Log("Reloading in Progress...");
             SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
         }
     }
 
     private void SetupLevel(int levelIndex)
     {
-        if (levelIndex >= 4)
-        {
-            Debug.Log("¬се уровни пройдены");
-            return;
-        }
-
         SpawnShape[] spawns = new SpawnShape[]
         {
             BlockSpawner.SpawnBlocks1,
@@ -48,26 +39,50 @@ public class LevelManager : MonoBehaviour
             BlockSpawner.SpawnBlocks4,
         };
 
-        BlockBehaviour[] behaviours = new BlockBehaviour[]
-        {
-            BlockV1.ChangeBlockColor,
-            BlockV2.ChangeBlockSprite,
-            BlockV3.HandleCollision,
-            BlockV4.BlockReducing
-        };
+        LevelCombination combination;
 
-        int behaviourIndex, spawnIndex;
+        if (LevlCombinationsStorage.Combinations.ContainsKey(levelIndex))
+        {
+            combination = LevlCombinationsStorage.Combinations[levelIndex];
+        }
+        else
+        {
+            combination = GenerateUniqueCombination();
+            LevlCombinationsStorage.Combinations.Add(levelIndex, combination);
+        }
+
+        spawns[combination.SpawnIndex](); 
+    }
+
+    private LevelCombination GenerateUniqueCombination()
+    {
+        int maxCombinations = 4;
+        if (LevlCombinationsStorage.Combinations.Count >= maxCombinations)
+        {
+            Debug.LogError("”никальные комбинации закончились");
+            return new LevelCombination(0);
+        }
+
+        int spawn;
         do
         {
-            behaviourIndex = Random.Range(0, 4);
-            spawnIndex = Random.Range(0, 4);
+            spawn = Random.Range(0, 4);
         }
-        while (_usedCombinations.Contains((behaviourIndex, spawnIndex)));
+        while (IsCombinationUsed(spawn));
 
-        _usedCombinations.Add((behaviourIndex, spawnIndex));
+        return new LevelCombination(spawn);
+    }
 
-        spawns[spawnIndex](); 
-        behaviours[behaviourIndex](); // в каждый блок передать статический индекс из поведени€ 
+    private bool IsCombinationUsed(int spawn)
+    {
+        foreach (var combo in LevlCombinationsStorage.Combinations.Values)
+        {
+            if (combo.SpawnIndex == spawn)
+            {
+                return (true);
+            }
+        }
+        return false;
     }
 
     private void ChangeBackgroundColor()

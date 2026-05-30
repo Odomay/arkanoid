@@ -8,11 +8,12 @@ public class BlockV1 : MonoBehaviour
 
     private void Awake()
     {
-        _spriteRenderer = GetComponent<SpriteRenderer>();
+        _spriteRenderer ??= GetComponent<SpriteRenderer>();
     }
 
     public void ChangeBlockColor()
     {
+        if (_spriteRenderer == null) return;
         _spriteRenderer.color = new Color(Random.value, Random.value, Random.value);
         StartCoroutine(BlockDestroy());
     }

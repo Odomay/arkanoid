@@ -39,7 +39,7 @@ public class Ball : MonoBehaviour
     {
         Vector3 hit = collision.contacts[0].normal;
         _savedDirectionAfterCollision = Vector3.Reflect(_reflectedDirection, hit).normalized * JumpForce;
-        _rigidbody.velocity = _savedDirectionAfterCollision;
+        _rigidbody.linearVelocity = _savedDirectionAfterCollision;
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
@@ -52,7 +52,7 @@ public class Ball : MonoBehaviour
 
     private void FixedUpdate()
     {
-        _reflectedDirection = _rigidbody.velocity;
+        _reflectedDirection = _rigidbody.linearVelocity;
     }
 
     private void Update()
@@ -65,7 +65,7 @@ public class Ball : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Space) && _ballOnPlatform)
         {
             
-            _rigidbody.velocity = (Vector2.up + new Vector2(Random.Range(-1f, 1f), 0)) * JumpForce;
+            _rigidbody.linearVelocity = (Vector2.up + new Vector2(Random.Range(-1f, 1f), 0)) * JumpForce;
             //_rigidbody.velocity = Vector2.up * JumpForce ;
             _ballOnPlatform = false;
         }
@@ -78,7 +78,7 @@ public class Ball : MonoBehaviour
             OnBallTouchedDestroyZone?.Invoke();
             transform.position = _ballPosition;
             Platform.position = _platformPosition;
-            _rigidbody.velocity = Vector2.zero;
+            _rigidbody.linearVelocity = Vector2.zero;
             _ballOnPlatform = true;
         }
         else
@@ -91,7 +91,7 @@ public class Ball : MonoBehaviour
     private void StopBall()
     {
         if (_rigidbody == null) return;
-        _rigidbody.velocity = Vector2.zero;
+        _rigidbody.linearVelocity = Vector2.zero;
         _rigidbody.angularVelocity = 0;
         _ballOnPlatform = false;
     }
@@ -105,8 +105,8 @@ public class Ball : MonoBehaviour
 
     private void PauseBall()
     {
-        _savedDirection = _rigidbody.velocity;
-        _rigidbody.velocity = Vector2.zero;
+        _savedDirection = _rigidbody.linearVelocity;
+        _rigidbody.linearVelocity = Vector2.zero;
         _rigidbody.angularVelocity = 0;
         _ballOnPlatform = false;
         
@@ -114,6 +114,6 @@ public class Ball : MonoBehaviour
 
     private void ResumeBall()
     {
-        _rigidbody.velocity = _savedDirection;
+        _rigidbody.linearVelocity = _savedDirection;
     }
 }

@@ -3,10 +3,11 @@ using DG.Tweening;
 using UnityEngine.SceneManagement;
 using System;
 using Random = UnityEngine.Random;
-using System.Runtime.InteropServices.WindowsRuntime;
 
 public class LoadingMenuPanel : MonoBehaviour
 {
+    public static float AnimationTime;
+
     [SerializeField] private RectTransform _topPart;
     [SerializeField] private RectTransform _bottomPart;
     [SerializeField] private RectTransform _leftPart;
@@ -23,24 +24,27 @@ public class LoadingMenuPanel : MonoBehaviour
 
     private void SetType()
     {
+        switch (_type)
+        {
+            case AnimationType.Width: PlayAnimationWidth(); break;
+
+            case AnimationType.Height: PlayAnimationHeight(); break;
+        }
+    }
+
+    private void ChooseType()
+    {
         AnimationType[] indexes = (AnimationType[])System.Enum.GetValues(typeof(AnimationType));
 
-        int randomIndex = Random.Range(0, indexes.Length);
+        _type = indexes[Random.Range(0, indexes.Length)];
 
-        switch (randomIndex)
-        {
-            case 0:
-                PlayAnimationWidth();
-                break;
-
-            case 1: PlayAnimationHeight();
-                break;
-        }
+        SetType();
     }
 
     private void Awake()
     {
-        ButtonsManager.OnButtonPresed += SetType;
+        ButtonsManager.OnButtonPressed += ChooseType;
+        AnimationTime = _animationTime;
     }
 
     private void PlayAnimationHeight()
@@ -49,8 +53,7 @@ public class LoadingMenuPanel : MonoBehaviour
         sequence.Join(_topPart.DOAnchorPosY(270, _animationTime)).Join(_bottomPart.DOAnchorPosY(-270, _animationTime)).
             OnComplete(() =>
             {
-                SceneManager.LoadScene(0);
-                ButtonsManager.OnButtonPresed -= SetType;
+                ButtonsManager.OnButtonPressed -= ChooseType;
             });
     }
 
@@ -60,8 +63,7 @@ public class LoadingMenuPanel : MonoBehaviour
         sequence.Join(_leftPart.DOAnchorPosX(-480, _animationTime)).Join(_rightPart.DOAnchorPosX(480, _animationTime)).
             OnComplete(() =>
             {
-                SceneManager.LoadScene(0);
-                ButtonsManager.OnButtonPresed -= SetType;
+                ButtonsManager.OnButtonPressed -= ChooseType;
             });
     }
 }
